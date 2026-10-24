@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register &middot; DevOps Learning</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true">
+        <rect width="48" height="48" rx="12" fill="url(#g)"/>
+        <path d="M14 26l7 7 13-16" fill="none" stroke="#fff" stroke-width="4"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#6366f1"/>
+            <stop offset="1" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>DevOps Learning</span>
+    </div>
+
+    <h1>Create your account</h1>
+    <p class="lead">It only takes a minute to get started.</p>
+
+    <form action="register" method="post" id="form" novalidate>
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" autocomplete="name"
+               placeholder="Asha Rao" required>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="mobile">Mobile</label>
+          <input id="mobile" name="mobile" type="tel" autocomplete="tel"
+                 placeholder="+91 98765 43210" required
+                 pattern="\+?[0-9 ()\-]{7,15}">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email"
+                 placeholder="asha@example.com" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw">
+          <input id="password" name="password" type="password" minlength="8"
+                 autocomplete="new-password" placeholder="At least 8 characters" required>
+          <button type="button" class="eye" id="toggle" aria-label="Show password">Show</button>
+        </div>
+        <div class="meter" aria-hidden="true"><span id="bar"></span></div>
+      </div>
+
+      <div class="field">
+        <label for="passwordRepeat">Repeat password</label>
+        <input id="passwordRepeat" name="passwordRepeat" type="password"
+               autocomplete="new-password" placeholder="Type it again" required>
+        <small id="match" class="hint" aria-live="polite"></small>
+      </div>
+
+      <button type="submit" class="btn">Create account</button>
+
+      <p class="fine">By creating an account you agree to our <a href="#">Terms &amp; Privacy</a>.</p>
+    </form>
+
+    <p class="signin">Already have an account? <a href="login">Sign in</a></p>
+
+    <div class="chips" aria-label="Deployment pipeline">
+      <span>Jenkins</span><span>Ansible</span><span>Docker</span><span>Kubernetes</span>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var pw = document.getElementById('password');
+      var rep = document.getElementById('passwordRepeat');
+      var bar = document.getElementById('bar');
+      var match = document.getElementById('match');
+      var toggle = document.getElementById('toggle');
+      var form = document.getElementById('form');
+
+      toggle.addEventListener('click', function () {
+        var show = pw.type === 'password';
+        pw.type = rep.type = show ? 'text' : 'password';
+        toggle.textContent = show ? 'Hide' : 'Show';
+        toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      });
+
+      function strength(v) {
+        var s = 0;
+        if (v.length >= 8) s++;
+        if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
+        if (/\d/.test(v)) s++;
+        if (/[^A-Za-z0-9]/.test(v)) s++;
+        return s;
+      }
+
+      pw.addEventListener('input', function () {
+        var s = strength(pw.value);
+        bar.style.width = (s * 25) + '%';
+        bar.className = 's' + s;
+        checkMatch();
+      });
+
+      function checkMatch() {
+        if (!rep.value) { match.textContent = ''; match.className = 'hint'; return true; }
+        var ok = pw.value === rep.value;
+        match.textContent = ok ? 'Passwords match' : 'Passwords do not match';
+        match.className = 'hint ' + (ok ? 'good' : 'bad');
+        rep.setCustomValidity(ok ? '' : 'Passwords do not match');
+        return ok;
+      }
+      rep.addEventListener('input', checkMatch);
+
+      form.addEventListener('submit', function (e) {
+        if (!checkMatch() || !form.checkValidity()) {
+          e.preventDefault();
+          form.reportValidity();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
