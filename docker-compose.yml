@@ -1,0 +1,36 @@
+# Runs the app + MySQL together.   Start:  docker compose up -d --build
+# Data is kept in the "db-data" volume, so it survives restarts and rebuilds.
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: regapp
+      MYSQL_USER: regapp
+      MYSQL_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-change-me-too}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    # No "ports:" on purpose - only the app (inside this network) can reach the database.
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://db:3306/regapp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: regapp
+      DB_PASSWORD: ${DB_PASSWORD:-change-me}
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:
